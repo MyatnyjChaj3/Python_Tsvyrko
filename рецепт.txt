@@ -1,0 +1,84 @@
+# (И)ванов -> (И)камэси
+
+import time
+
+# Класс Ингредиент
+class Ingredient:
+    def __init__(self, name, weight_kg, price_per_kg):
+        self.name = name
+        self.weight_kg = weight_kg
+        self.price_per_kg = price_per_kg
+
+    def get_cost(self):
+        return self.weight_kg * self.price_per_kg
+
+# Класс Этап Приготовления
+class CookingStep:
+    def __init__(self, description, time_to_next_step):
+        self.description = description
+        self.time_to_next_step = time_to_next_step
+
+# Класс Рецепт
+class Recipe:
+    def __init__(self, name, ingredients, steps):
+        self.name = name
+        self.ingredients = [Ingredient(*ingredient) for ingredient in ingredients]
+        self.steps = [CookingStep(*step) for step in steps]
+
+    def get_raw_weight(self):
+        return sum(ingredient.weight_kg for ingredient in self.ingredients)
+
+    def get_cooked_weight(self):
+        # Допустим, при готовке теряется 10% массы.
+        return self.get_raw_weight() * 0.9
+
+    def get_cost(self):
+        return sum(ingredient.get_cost() for ingredient in self.ingredients)
+
+    def get_total_cooking_time(self):
+        return sum(step.time_to_next_step for step in self.steps)
+
+# Класс Автоматический Приготовитель
+class AutomaticCooker:
+    def __init__(self, recipe):
+        self.recipe = recipe
+
+    def simulate_cooking(self, num_dishes=1):
+        print(f"Начинаем приготовление блюда: {self.recipe.name}\n")
+        print(f"Вес сырого продукта: {self.recipe.get_raw_weight() * num_dishes:.2f} кг")
+        print(f"Вес готового продукта: {self.recipe.get_cooked_weight() * num_dishes:.2f} кг")
+        print(f"Себестоимость одного блюда: {self.recipe.get_cost():.2f} руб.")
+        print(f"Себестоимость {num_dishes} блюд: {self.recipe.get_cost() * num_dishes:.2f} руб.")
+        print(f"Общее время приготовления: {self.recipe.get_total_cooking_time()} минут\n")
+
+        for step in self.recipe.steps:
+            print(step.description)
+            time.sleep(step.time_to_next_step)
+
+# Рецепт для Икамэси (фаршированные кальмары рисом)
+ikameshi_recipe = {
+    "name": "Икамэси",
+    "ingredients": [
+        ("Кальмар", 0.4, 500),  # 0.4 кг кальмара, 500 руб/кг
+        ("Рис", 0.2, 100),  # 0.2 кг риса, 100 руб/кг
+        ("Соевый соус", 0.05, 300),  # 50 мл соевого соуса, 300 руб/л
+        ("Сахар", 0.01, 50),  # 10 г сахара, 50 руб/кг
+        ("Мирин", 0.05, 400)  # 50 мл мирина, 400 руб/л
+    ],
+    "steps": [
+        ("Очистить кальмаров и приготовить рис.", 10),
+        ("Фаршировать кальмаров готовым рисом.", 5),
+        ("Смешать соевый соус, мирин и сахар, довести до кипения.", 5),
+        ("Добавить фаршированных кальмаров в соус и варить на медленном огне 20 минут.", 20),
+        ("Дать кальмарам настояться в соусе 10 минут.", 10)
+    ]
+}
+
+# Создаем экземпляр рецепта
+recipe = Recipe(ikameshi_recipe["name"], ikameshi_recipe["ingredients"], ikameshi_recipe["steps"])
+
+# Создаем экземпляр Приготовителя
+cooker = AutomaticCooker(recipe)
+
+# Симуляция приготовления 3 блюд
+cooker.simulate_cooking(num_dishes=3)
